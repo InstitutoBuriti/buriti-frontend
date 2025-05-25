@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Navbar from './Navbar';
@@ -8,7 +9,7 @@ import Auth from './pages/Auth';
 import Sobre from './pages/Sobre';
 import Contato from './pages/Contato';
 import Dashboard from './pages/Dashboard';
-import Perfil from './pages/Dashboard/Perfil';
+import Perfil from './pages/dashboard/Perfil';            // <— ajustado aqui
 import CoursePlayer from './pages/CoursePlayer';
 import AdminLayout from './pages/AdminLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -26,7 +27,7 @@ import CourseEditor from './pages/Admin/CourseEditor';
 import CourseContentManager from './pages/Admin/CourseContentManager';
 import AlunoManager from './pages/Admin/AlunoManager';
 import NoticiaManager from './pages/Admin/NoticiaManager';
-import AdminPerfil from './pages/Admin/AdminPerfil';  // <- ajustado aqui
+import AdminPerfil from './pages/Admin/AdminPerfil';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
@@ -81,7 +82,7 @@ function App() {
           <Route path="cursos/conteudo/:id" element={<CourseContentManager />} />
           <Route path="alunos" element={<AlunoManager />} />
           <Route path="noticias" element={<NoticiaManager />} />
-          <Route path="perfil" element={<AdminPerfil />} />  {/* <- nova rota */}
+          <Route path="perfil" element={<AdminPerfil />} />
         </Route>
       </Routes>
     </div>

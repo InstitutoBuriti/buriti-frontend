@@ -9,7 +9,7 @@ import Auth from './pages/Auth';
 import Sobre from './pages/Sobre';
 import Contato from './pages/Contato';
 import Dashboard from './pages/Dashboard';
-import Perfil from './pages/Dashboard/perfil';      // ← aqui, “Dashboard” com D maiúsculo e “perfil” todo minúsculo
+import Perfil from './pages/Dashboard/perfil';      // ← “Dashboard” com D maiúsculo e “perfil” minúsculo
 import CoursePlayer from './pages/CoursePlayer';
 import AdminLayout from './pages/AdminLayout';
 import DashboardLayout from './layouts/DashboardLayout';

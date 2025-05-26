@@ -1,4 +1,3 @@
-```jsx
 // src/App.jsx
 import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -10,7 +9,7 @@ import Auth from './pages/Auth';
 import Sobre from './pages/Sobre';
 import Contato from './pages/Contato';
 import Dashboard from './pages/Dashboard';
-import Perfil from './pages/Dashboard/perfil';      // pasta "Dashboard" e arquivo "perfil.jsx" correspondem exatamente ao filesystem
+import Perfil from './pages/Dashboard/perfil.jsx';  // import com extensão explícita para evitar ambiguidade
 import CoursePlayer from './pages/CoursePlayer';
 import AdminLayout from './pages/AdminLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -91,5 +90,4 @@ function App() {
 }
 
 export default App;
-```
 

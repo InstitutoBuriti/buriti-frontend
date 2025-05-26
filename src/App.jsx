@@ -8,8 +8,9 @@ import CourseDetails from './pages/CourseDetails';
 import Auth from './pages/Auth';
 import Sobre from './pages/Sobre';
 import Contato from './pages/Contato';
-import Dashboard from './pages/Dashboard';
-import Perfil from './pages/Dashboard/perfil.jsx';  // import com extensão explícita para evitar ambiguidade
+// A página que antes era Dashboard.jsx agora está em HomeDashboard.jsx
+import HomeDashboard from './pages/HomeDashboard.jsx';
+import Perfil from './pages/Dashboard/perfil.jsx';
 import CoursePlayer from './pages/CoursePlayer';
 import AdminLayout from './pages/AdminLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -58,7 +59,7 @@ function App() {
             <DashboardLayout />
           </ProtectedRoute>
         }>
-          <Route index element={<Dashboard />} />
+          <Route index element={<HomeDashboard />} />
           <Route path="modulos" element={<DashboardModulos />} />
           <Route path="tarefas" element={<DashboardTarefas />} />
           <Route path="testes" element={<DashboardTestes />} />

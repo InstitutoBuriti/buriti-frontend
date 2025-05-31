@@ -1,4 +1,9 @@
+// src/contexts/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
+
+// Pega a URL da API a partir da variável de ambiente VITE_API_URL.
+// Se não estiver definida (ex.: rodando localmente sem .env), usamos http://localhost:4000.
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const AuthContext = createContext();
 
@@ -10,7 +15,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (token && storedUser) {
-      fetch("http://localhost:4000/api/ping", {
+      fetch(`${API_URL}/api/ping`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -37,7 +42,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, senha) => {
     try {
-      const res = await fetch("http://localhost:4000/api/login", {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,9 +70,9 @@ export function AuthProvider({ children }) {
   };
 
   const updateProfile = async (formData) => {
-    console.log('Dados enviados para atualização:', formData); // Log para depuração
+    console.log("Dados enviados para atualização:", formData);
     try {
-      const res = await fetch(`http://localhost:4000/api/users/${user.id}`, {
+      const res = await fetch(`${API_URL}/api/users/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +82,7 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
-      console.log('Resposta recebida em /api/users/:id:', data); // Log para depuração
+      console.log("Resposta recebida em /api/users/:id:", data);
 
       if (res.ok) {
         const updatedUser = { ...user, ...formData };
@@ -105,7 +110,9 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, userType: user?.role, login, updateProfile, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, userType: user?.role, login, updateProfile, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -114,3 +121,4 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+

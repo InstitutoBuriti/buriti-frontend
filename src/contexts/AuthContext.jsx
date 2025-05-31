@@ -1,9 +1,13 @@
 // src/contexts/AuthContext.jsx
+
 import { createContext, useContext, useEffect, useState } from "react";
 
-// Pega a URL da API a partir da variável de ambiente VITE_API_URL.
-// Se não estiver definida (ex.: rodando localmente sem .env), usamos http://localhost:4000.
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+// Vamos ler a URL do backend a partir da variável de ambiente:
+//   - Lembre-se de que, no Vercel, você definiu VITE_API_URL apontando
+//     para algo como "https://buriti-backend.onrender.com" (ou onde seu backend esteja rodando).
+//   - No seu .env.local (para desenvolvimento), deve haver algo como:
+//       VITE_API_URL="http://localhost:4000"
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AuthContext = createContext();
 
@@ -15,6 +19,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (token && storedUser) {
+      // Faz um "ping" ao backend para verificar se o token ainda é válido
       fetch(`${API_URL}/api/ping`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -24,12 +29,14 @@ export function AuthProvider({ children }) {
           if (res.ok) {
             setUser(JSON.parse(storedUser));
           } else {
+            // Token inválido ou expirado: limpa tudo
             localStorage.clear();
             setUser(null);
             setToken(null);
           }
         })
         .catch(() => {
+          // Qualquer falha, limpa também
           localStorage.clear();
           setUser(null);
           setToken(null);
@@ -40,6 +47,7 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
+  // Função de login: usa fetch para chamar /api/login no backend
   const login = async (email, senha) => {
     try {
       const res = await fetch(`${API_URL}/api/login`, {
@@ -54,6 +62,7 @@ export function AuthProvider({ children }) {
       console.log("Resposta recebida em /api/login:", data);
 
       if (res.ok) {
+        // Se login OK, armazena token e usuário
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         setToken(data.token);
@@ -61,14 +70,21 @@ export function AuthProvider({ children }) {
         return { success: true, role: data.user.role };
       } else {
         console.error("Erro no login:", data.error);
-        return { success: false, error: data.error || "Credenciais inválidas." };
+        return {
+          success: false,
+          error: data.error || "Credenciais inválidas.",
+        };
       }
     } catch (err) {
       console.error("Erro ao fazer login:", err.message);
-      return { success: false, error: "Erro ao conectar com o servidor. Tente novamente." };
+      return {
+        success: false,
+        error: "Erro ao conectar com o servidor. Tente novamente.",
+      };
     }
   };
 
+  // Função para atualizar perfil — também usa a mesma variável de ambiente
   const updateProfile = async (formData) => {
     console.log("Dados enviados para atualização:", formData);
     try {
@@ -85,17 +101,24 @@ export function AuthProvider({ children }) {
       console.log("Resposta recebida em /api/users/:id:", data);
 
       if (res.ok) {
+        // Se atualização deu certo, atualizo o user no contexto e no localStorage
         const updatedUser = { ...user, ...formData };
         setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
         return { success: true, message: data.message };
       } else {
         console.error("Erro ao atualizar perfil:", data.error);
-        return { success: false, error: data.error || "Erro ao atualizar perfil." };
+        return {
+          success: false,
+          error: data.error || "Erro ao atualizar perfil.",
+        };
       }
     } catch (err) {
       console.error("Erro ao atualizar perfil:", err.message);
-      return { success: false, error: "Erro ao conectar com o servidor. Tente novamente." };
+      return {
+        success: false,
+        error: "Erro ao conectar com o servidor. Tente novamente.",
+      };
     }
   };
 
@@ -106,7 +129,9 @@ export function AuthProvider({ children }) {
   };
 
   if (carregando) {
-    return <div className="text-center text-gray-700 font-montserrat">Carregando...</div>;
+    return (
+      <div className="text-center text-gray-700 font-montserrat">Carregando...</div>
+    );
   }
 
   return (

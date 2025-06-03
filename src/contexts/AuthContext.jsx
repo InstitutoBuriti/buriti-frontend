@@ -1,14 +1,5 @@
 // src/contexts/AuthContext.jsx
-
 import { createContext, useContext, useEffect, useState } from "react";
-
-// 1) Lê a variável de ambiente VITE_API_URL
-const API_URL = import.meta.env.VITE_API_URL;
-
-// ** DEBUG: mostre no console qual valor realmente está sendo lido **
-// Em produção, esperamos algo como "https://buriti-backend.onrender.com",
-// e em dev: "http://localhost:4000"
-console.log("🛠️ [AuthContext] API_URL =", API_URL);
 
 const AuthContext = createContext();
 
@@ -16,6 +7,15 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [carregando, setCarregando] = useState(true);
+
+  // Aqui garantimos que a variável de ambiente exista
+  const API_URL = import.meta.env.VITE_API_URL;
+  if (!API_URL) {
+    throw new Error(
+      "VITE_API_URL não está definido. Verifique as variáveis de ambiente."
+    );
+  }
+  console.log("API_URL =", API_URL);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -56,7 +56,7 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
-      console.log("🛠️ [AuthContext] Resposta /api/login:", data);
+      console.log("Resposta recebida em /api/login:", data);
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
@@ -65,11 +65,14 @@ export function AuthProvider({ children }) {
         setUser(data.user);
         return { success: true, role: data.user.role };
       } else {
-        console.error("🛠️ [AuthContext] Erro no login:", data.error);
-        return { success: false, error: data.error || "Credenciais inválidas." };
+        console.error("Erro no login:", data.error);
+        return {
+          success: false,
+          error: data.error || "Credenciais inválidas.",
+        };
       }
     } catch (err) {
-      console.error("🛠️ [AuthContext] Erro ao fazer login:", err.message);
+      console.error("Erro ao fazer login:", err.message);
       return {
         success: false,
         error: "Erro ao conectar com o servidor. Tente novamente.",
@@ -78,7 +81,7 @@ export function AuthProvider({ children }) {
   };
 
   const updateProfile = async (formData) => {
-    console.log("🛠️ [AuthContext] Dados para updateProfile:", formData);
+    console.log("Dados enviados para atualização:", formData);
     try {
       const res = await fetch(`${API_URL}/api/users/${user.id}`, {
         method: "PUT",
@@ -90,7 +93,7 @@ export function AuthProvider({ children }) {
       });
 
       const data = await res.json();
-      console.log("🛠️ [AuthContext] Resposta /api/users/:id:", data);
+      console.log("Resposta recebida em /api/users/:id:", data);
 
       if (res.ok) {
         const updatedUser = { ...user, ...formData };
@@ -98,11 +101,11 @@ export function AuthProvider({ children }) {
         localStorage.setItem("user", JSON.stringify(updatedUser));
         return { success: true, message: data.message };
       } else {
-        console.error("🛠️ [AuthContext] Erro ao atualizar perfil:", data.error);
+        console.error("Erro ao atualizar perfil:", data.error);
         return { success: false, error: data.error || "Erro ao atualizar perfil." };
       }
     } catch (err) {
-      console.error("🛠️ [AuthContext] Erro ao atualizar perfil:", err.message);
+      console.error("Erro ao atualizar perfil:", err.message);
       return {
         success: false,
         error: "Erro ao conectar com o servidor. Tente novamente.",
@@ -117,11 +120,15 @@ export function AuthProvider({ children }) {
   };
 
   if (carregando) {
-    return <div className="text-center text-gray-700 font-montserrat">Carregando...</div>;
+    return (
+      <div className="text-center text-gray-700 font-montserrat">Carregando...</div>
+    );
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, userType: user?.role, login, updateProfile, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, userType: user?.role, login, updateProfile, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

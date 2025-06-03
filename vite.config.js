@@ -7,7 +7,7 @@ export default defineConfig({
   base: '/',             // URL base
   plugins: [react()],
   resolve: {
-    extensions: ['.js', '.jsx'], 
+    extensions: ['.js', '.jsx'],
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
@@ -32,5 +32,7 @@ export default defineConfig({
   server: {
     open: true,
   },
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'https://buriti-backend.onrender.com'),
+  },
 });
-

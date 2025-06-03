@@ -8,14 +8,14 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [carregando, setCarregando] = useState(true);
 
-  // Aqui garantimos que a variável de ambiente exista
+  // Garantir que a variável de ambiente VITE_API_URL esteja definida
   const API_URL = import.meta.env.VITE_API_URL;
   if (!API_URL) {
     throw new Error(
-      "VITE_API_URL não está definido. Verifique as variáveis de ambiente."
+      "VITE_API_URL não está definido. Verifique as variáveis de ambiente no Vercel ou .env.production."
     );
   }
-  console.log("API_URL =", API_URL);
+  console.log("API_URL =", API_URL); // Debug para verificar o valor em produção
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -137,4 +137,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-

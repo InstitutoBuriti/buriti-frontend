@@ -1,150 +1,116 @@
-import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import Logo from "../assets/Logo.png";
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Navbar() {
-  const { user, logout } = useContext(AuthContext);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const debounceTimeout = useRef(null);
+  const containerRef = useRef(null);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/entrar");
+  // Fetch com debounce sempre que o query mudar
+  useEffect(() => {
+    if (query.trim() === '') {
+      setSuggestions([]);
+      return;
+    }
+    clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `${API_URL}/api/cursos?search=${encodeURIComponent(query)}`
+        );
+        const data = await res.json();
+        setSuggestions(data);
+        setIsOpen(true);
+      } catch (err) {
+        console.error('Erro na busca:', err);
+      }
+    }, 300);
+    return () => clearTimeout(debounceTimeout.current);
+  }, [query]);
+
+  // Fecha o dropdown ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleChange = (e) => {
+    setQuery(e.target.value);
+  };
+
+  const handleSelect = () => {
+    setQuery('');
+    setIsOpen(false);
   };
 
   return (
-    <nav className="bg-buriti-red text-buriti-white py-4 shadow-md" role="navigation" aria-label="Menu principal">
-      <div className="container mx-auto flex items-center justify-between px-4">
-        {/* Logo */}
-        <Link to="/" className="flex items-center" aria-label="Página inicial do Instituto Buriti">
-          <img src={Logo} alt="Logotipo do Instituto Buriti" className="h-10" />
+    <nav className="bg-buriti-red text-white py-4">
+      <div
+        className="max-w-6xl mx-auto px-4 flex items-center justify-between relative"
+        ref={containerRef}
+      >
+        <Link to="/" className="text-xl font-montserrat font-bold">
+          Instituto Buriti
         </Link>
 
-        {/* Campo de Busca */}
-        <div className="hidden md:flex flex-1 justify-center">
+        {/* Campo de busca */}
+        <div className="flex-1 mx-4">
           <input
             type="text"
-            placeholder="Pesquisar cursos..."
-            className="w-1/2 px-4 py-2 rounded-l-lg bg-buriti-white text-buriti-gray focus:outline-none focus:ring-2 focus:ring-buriti-orange"
-            disabled
-            aria-label="Campo de busca desabilitado"
+            value={query}
+            onChange={handleChange}
+            onFocus={() => suggestions.length && setIsOpen(true)}
+            placeholder="Buscar cursos..."
+            className="w-full px-3 py-2 rounded text-black"
           />
-          <button
-            className="bg-buriti-orange px-4 py-2 rounded-r-lg text-white hover:bg-buriti-dark-red transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-buriti-orange"
-            disabled
-            aria-disabled="true"
-          >
-            Buscar
-          </button>
-        </div>
-
-        {/* Menu Desktop */}
-        <div className="hidden md:flex items-center space-x-4">
-          <Link to="/" aria-label="Ir para Início" className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white transition">
-            Início
-          </Link>
-          <Link to="/cursos" aria-label="Ir para Cursos" className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white transition">
-            Cursos
-          </Link>
-          <Link to="/sobre" aria-label="Ir para Sobre" className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white transition">
-            Sobre
-          </Link>
-          <Link to="/contato" aria-label="Ir para Contato" className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white transition">
-            Contato
-          </Link>
-          {user ? (
-            <>
-              <Link
-                to={user.role === "admin" ? "/admin" : "/dashboard"}
-                aria-label={user.role === "admin" ? "Painel do Administrador" : "Painel do Aluno"}
-                className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white transition"
-              >
-                {user.role === "admin" ? "Admin" : "Dashboard"}
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-buriti-orange px-4 py-2 rounded-lg hover:bg-buriti-dark-red text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-white"
-                aria-label="Sair do sistema"
-              >
-                Sair
-              </button>
-            </>
-          ) : (
-            <Link
-              to="/entrar"
-              aria-label="Entrar na plataforma"
-              className="bg-buriti-orange px-4 py-2 rounded-lg hover:bg-buriti-dark-red text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-white"
-            >
-              Entrar
-            </Link>
+          {isOpen && suggestions.length > 0 && (
+            <ul className="absolute bg-white text-black w-full mt-1 max-h-60 overflow-auto rounded shadow-lg z-10">
+              {suggestions.map((curso) => (
+                <li
+                  key={curso.id}
+                  className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
+                >
+                  <Link
+                    to={`/cursos/${curso.id}`}
+                    onClick={handleSelect}
+                    className="block"
+                  >
+                    {curso.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
-        {/* Menu Mobile */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-white focus:outline-none focus:ring-2 focus:ring-buriti-orange"
-            aria-label="Abrir menu mobile"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-            </svg>
-          </button>
+        {/* Links estáticos */}
+        <div className="flex space-x-4 font-montserrat">
+          <Link to="/cursos" className="hover:text-buriti-orange">
+            Cursos
+          </Link>
+          <Link to="/sobre" className="hover:text-buriti-orange">
+            Sobre
+          </Link>
+          <Link to="/contato" className="hover:text-buriti-orange">
+            Contato
+          </Link>
+          <Link to="/entrar" className="hover:text-buriti-orange">
+            Entrar
+          </Link>
         </div>
       </div>
-
-      {/* Dropdown Mobile */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-buriti-red py-4">
-          <div className="flex flex-col items-center space-y-4">
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white">
-              Início
-            </Link>
-            <Link to="/cursos" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white">
-              Cursos
-            </Link>
-            <Link to="/sobre" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white">
-              Sobre
-            </Link>
-            <Link to="/contato" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white">
-              Contato
-            </Link>
-            {user ? (
-              <>
-                <Link
-                  to={user.role === "admin" ? "/admin" : "/dashboard"}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="hover:text-buriti-orange focus:outline-none focus:ring-2 focus:ring-white"
-                >
-                  {user.role === "admin" ? "Admin" : "Dashboard"}
-                </Link>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="bg-buriti-orange px-4 py-2 rounded-lg hover:bg-buriti-dark-red text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white"
-                >
-                  Sair
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/entrar"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="bg-buriti-orange px-4 py-2 rounded-lg hover:bg-buriti-dark-red text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white"
-              >
-                Entrar
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
     </nav>
-  );
-}
+);
 
 export default Navbar;
 

@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function NovoCurso() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -22,7 +25,7 @@ function NovoCurso() {
       formDataToSend.append("imagem", e.target.imagem.files[0]);
     }
 
-    fetch("http://localhost:4000/api/cursos", {
+    fetch(`${API_URL}/api/cursos`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,

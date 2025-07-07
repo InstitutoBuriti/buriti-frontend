@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function NoticiaManager() {
   const { user } = useAuth();
   const [noticias, setNoticias] = useState([]);
@@ -13,7 +16,7 @@ function NoticiaManager() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/noticias", {
+    fetch(`${API_URL}/api/noticias`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -25,7 +28,7 @@ function NoticiaManager() {
 
   const handleNovaNoticia = (e) => {
     e.preventDefault();
-    fetch("http://localhost:4000/api/noticias", {
+    fetch(`${API_URL}/api/noticias`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +46,7 @@ function NoticiaManager() {
 
   const handleEditarNoticia = (id) => {
     const noticia = noticias.find((n) => n.id === id);
-    fetch(`http://localhost:4000/api/noticias/${id}`, {
+    fetch(`${API_URL}/api/noticias/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +62,7 @@ function NoticiaManager() {
   };
 
   const handleExcluirNoticia = (id) => {
-    fetch(`http://localhost:4000/api/noticias/${id}`, {
+    fetch(`${API_URL}/api/noticias/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,

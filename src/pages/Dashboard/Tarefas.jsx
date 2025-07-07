@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Tarefas() {
   const { user, token } = useAuth();
   const [tarefas, setTarefas] = useState([]);
@@ -9,7 +12,7 @@ function Tarefas() {
   const [mensagem, setMensagem] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/enrollments", {
+    fetch(`${API_URL}/api/enrollments`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -20,7 +23,7 @@ function Tarefas() {
   }, [token]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/tasks", {
+    fetch(`${API_URL}/api/tasks`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -56,7 +59,7 @@ function Tarefas() {
     formData.append("user_id", user.id);
     formData.append("tarefa_id", tarefaId);
 
-    fetch(`http://localhost:4000/api/tasks/${tarefaId}/upload`, {
+    fetch(`${API_URL}/api/tasks/${tarefaId}/upload`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -138,4 +141,3 @@ function Tarefas() {
 }
 
 export default Tarefas;
-

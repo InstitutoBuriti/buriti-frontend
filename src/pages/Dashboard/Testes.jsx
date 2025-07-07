@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Testes() {
   const { token, user } = useAuth();
   const [testes, setTestes] = useState([]);
@@ -10,7 +13,7 @@ function Testes() {
   const [notaFinal, setNotaFinal] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/enrollments", {
+    fetch(`${API_URL}/api/enrollments`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -19,7 +22,7 @@ function Testes() {
   }, [token]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/tests", {
+    fetch(`${API_URL}/api/tests`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -58,7 +61,7 @@ function Testes() {
     const total = teste.perguntas.length;
     const nota = ((acertos / total) * 10).toFixed(1);
 
-    fetch(`http://localhost:4000/api/tests/${teste.id}`, {
+    fetch(`${API_URL}/api/tests/${teste.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -143,4 +146,3 @@ function Testes() {
 }
 
 export default Testes;
-

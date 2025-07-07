@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
+
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Navbar() {
   const [query, setQuery] = useState('');
@@ -7,6 +11,8 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const debounceTimeout = useRef(null);
   const containerRef = useRef(null);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   // Fetch com debounce sempre que o query mudar
   useEffect(() => {
@@ -18,7 +24,7 @@ function Navbar() {
     debounceTimeout.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/cursos?search=${encodeURIComponent(query)}`
+          `${API_URL}/api/cursos?search=${encodeURIComponent(query)}`
         );
         const data = await res.json();
         setSuggestions(data);
@@ -45,9 +51,15 @@ function Navbar() {
     setQuery(e.target.value);
   };
 
-  const handleSelect = () => {
+  const handleSelect = (cursoId) => {
+    navigate(`/cursos/${cursoId}`);
     setQuery('');
     setIsOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/entrar');
   };
 
   return (
@@ -79,7 +91,7 @@ function Navbar() {
                 >
                   <Link
                     to={`/cursos/${curso.id}`}
-                    onClick={handleSelect}
+                    onClick={() => handleSelect(curso.id)}
                     className="block"
                   >
                     {curso.title}
@@ -90,7 +102,7 @@ function Navbar() {
           )}
         </div>
 
-        {/* Links estáticos */}
+        {/* Links estáticos e dinâmicos */}
         <div className="flex space-x-4 font-montserrat">
           <Link to="/cursos" className="hover:text-buriti-orange">
             Cursos
@@ -101,9 +113,15 @@ function Navbar() {
           <Link to="/contato" className="hover:text-buriti-orange">
             Contato
           </Link>
-          <Link to="/entrar" className="hover:text-buriti-orange">
-            Entrar
-          </Link>
+          {user ? (
+            <button onClick={handleLogout} className="hover:text-buriti-orange">
+              Sair
+            </button>
+          ) : (
+            <Link to="/entrar" className="hover:text-buriti-orange">
+              Entrar
+            </Link>
+          )}
         </div>
       </div>
     </nav>
@@ -111,4 +129,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

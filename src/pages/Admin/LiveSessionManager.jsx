@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function LiveSessionManager() {
   const { user } = useAuth();
   const [cursos, setCursos] = useState([]);
@@ -15,7 +18,7 @@ function LiveSessionManager() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/cursos", {
+    fetch(`${API_URL}/api/cursos`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -27,7 +30,7 @@ function LiveSessionManager() {
 
   useEffect(() => {
     if (selectedCurso) {
-      fetch(`http://localhost:4000/api/cursos/${selectedCurso}/conteudo`, {
+      fetch(`${API_URL}/api/cursos/${selectedCurso}/conteudo`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -40,7 +43,7 @@ function LiveSessionManager() {
 
   const handleNovaLiveSession = (e) => {
     e.preventDefault();
-    fetch("http://localhost:4000/api/liveSessions", {
+    fetch(`${API_URL}/api/liveSessions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -63,7 +66,7 @@ function LiveSessionManager() {
   };
 
   const handleExcluirLiveSession = (moduloId, liveSessionId) => {
-    fetch(`http://localhost:4000/api/liveSessions/${liveSessionId}`, {
+    fetch(`${API_URL}/api/liveSessions/${liveSessionId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,

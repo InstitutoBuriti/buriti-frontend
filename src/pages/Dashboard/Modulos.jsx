@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Modulos() {
   const { user } = useAuth();
   const [cursos, setCursos] = useState([]);
@@ -9,7 +12,7 @@ function Modulos() {
   const [matriculas, setMatriculas] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/enrollments", {
+    fetch(`${API_URL}/api/enrollments`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -20,7 +23,7 @@ function Modulos() {
   }, [user.id]);
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/progress/${user.id}`, {
+    fetch(`${API_URL}/api/progress/${user.id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -31,7 +34,7 @@ function Modulos() {
   }, [user.id]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/cursos")
+    fetch(`${API_URL}/api/cursos`)
       .then((res) => res.json())
       .then((data) => {
         const cursosMatriculados = data.filter((curso) =>
@@ -46,7 +49,7 @@ function Modulos() {
   }, [matriculas]);
 
   const marcarComoAssistida = (cursoId, moduloId, aulaId) => {
-    fetch(`http://localhost:4000/api/progress/${user.id}`, {
+    fetch(`${API_URL}/api/progress/${user.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

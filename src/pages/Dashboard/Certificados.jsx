@@ -3,6 +3,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import jsPDF from 'jspdf';
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function DashboardCertificados() {
   const { token } = useAuth();
   const [certificates, setCertificates] = useState([]);
@@ -12,7 +15,7 @@ function DashboardCertificados() {
     async function fetchCertificates() {
       try {
         // Buscar matrículas do usuário
-        const enrollRes = await fetch('http://localhost:4000/api/enrollments', {
+        const enrollRes = await fetch(`${API_URL}/api/enrollments`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!enrollRes.ok) throw new Error('Não foi possível buscar matrículas');
@@ -23,7 +26,7 @@ function DashboardCertificados() {
         const results = await Promise.all(
           courseIds.map(async courseId => {
             try {
-              const res = await fetch(`http://localhost:4000/api/certificates/${courseId}`, {
+              const res = await fetch(`${API_URL}/api/certificates/${courseId}`, {
                 headers: { Authorization: `Bearer ${token}` }
               });
               if (!res.ok) {
@@ -86,4 +89,3 @@ function DashboardCertificados() {
 }
 
 export default DashboardCertificados;
-

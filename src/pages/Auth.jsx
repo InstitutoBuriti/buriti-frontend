@@ -1,106 +1,59 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import Footer from "../components/Footer";
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
 
-function Auth() {
-  const [modo, setModo] = useState("login");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
-
+export default function Auth() {
+  const [formData, setFormData] = useState({ email: '', senha: '' }); // Alterado para 'senha'
+  const [error, setError] = useState('');
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { login, user } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (modo === "login") {
-      const result = login(email, senha);
-      if (result.success) {
-        setErro("");
-      } else {
-        setErro("E-mail ou senha inválidos.");
-        setSenha("");
-      }
-    } else {
-      const novoAluno = {
-        id: Date.now(),
-        nome: "Aluno Teste",
-        email,
-        role: "aluno",
-      };
-      localStorage.setItem("user", JSON.stringify(novoAluno));
-      localStorage.setItem("alunoLogado", JSON.stringify(novoAluno));
-      setErro("");
-      navigate("/dashboard");
+    try {
+      const response = await login(formData.email, formData.senha); // Usando 'senha'
+      if (response && response.success) navigate('/dashboard');
+      else setError(response.error || 'Falha no login.');
+    } catch (err) {
+      setError('Falha no login. Verifique suas credenciais.');
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      if (user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
-    }
-  }, [user, navigate]);
-
   return (
-    <div className="bg-buriti-gray min-h-screen flex flex-col justify-between">
-      <main className="px-6 py-16 max-w-md mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-buriti-red font-montserrat mb-2">
-            {modo === "login" ? "Login do Aluno" : "Cadastrar Novo Aluno"}
-          </h1>
-          <p className="text-gray-700 font-inter">
-            {modo === "login"
-              ? "Acesse seus cursos com seu e-mail e senha cadastrados."
-              : "Preencha os campos abaixo para criar uma nova conta."}
-          </p>
-        </div>
-
-        {erro && <p className="text-red-500 text-sm mb-4">{erro}</p>}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Entrar</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block mb-1">Email</label>
           <input
             type="email"
-            placeholder="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+            required
           />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-1">Senha</label>
           <input
             type="password"
-            placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            className="w-full px-4 py-2 border rounded"
+            name="senha" // Alterado para 'senha' para corresponder ao teste
+            value={formData.senha}
+            onChange={handleChange}
+            className="w-full p-2 border rounded"
+            required
           />
-          <button
-            type="submit"
-            className="w-full bg-buriti-red text-white py-2 rounded"
-          >
-            {modo === "login" ? "Entrar" : "Cadastrar"}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => setModo(modo === "login" ? "register" : "login")}
-            className="text-sm text-buriti-cyan hover:underline"
-          >
-            {modo === "login"
-              ? "Ainda não tem uma conta? Cadastre-se"
-              : "Já tem uma conta? Faça login"}
-          </button>
         </div>
-      </main>
-      <Footer />
+        <button type="submit" className="w-full bg-buriti-red text-white p-2 rounded">
+          Entrar
+        </button>
+      </form>
     </div>
   );
 }
-
-export default Auth;
-

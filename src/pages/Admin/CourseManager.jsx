@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function CourseManager() {
   const { user } = useAuth();
   const [cursos, setCursos] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/cursos", {
+    fetch(`${API_URL}/api/cursos`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -18,7 +21,7 @@ function CourseManager() {
   }, []);
 
   const excluirCurso = (id) => {
-    fetch(`http://localhost:4000/api/cursos/${id}`, {
+    fetch(`${API_URL}/api/cursos/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,

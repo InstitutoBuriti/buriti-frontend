@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function CourseContentManager() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -9,7 +12,7 @@ function CourseContentManager() {
   const [modulos, setModulos] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/cursos/${id}`, {
+    fetch(`${API_URL}/api/cursos/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -20,7 +23,7 @@ function CourseContentManager() {
   }, [id]);
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/cursos/${id}/conteudo`, {
+    fetch(`${API_URL}/api/cursos/${id}/conteudo`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

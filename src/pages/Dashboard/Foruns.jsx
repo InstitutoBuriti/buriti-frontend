@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Foruns() {
   const { user, token } = useAuth();
   const [foruns, setForuns] = useState([]);
@@ -9,7 +12,7 @@ function Foruns() {
   const [statusEnvio, setStatusEnvio] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/enrollments", {
+    fetch(`${API_URL}/api/enrollments`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -18,7 +21,7 @@ function Foruns() {
   }, [token]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/foruns", {
+    fetch(`${API_URL}/api/foruns`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -39,7 +42,7 @@ function Foruns() {
 
     setStatusEnvio((prev) => ({ ...prev, [forumId]: "enviando" }));
 
-    fetch(`http://localhost:4000/api/foruns/${forumId}/messages`, {
+    fetch(`${API_URL}/api/foruns/${forumId}/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,4 +134,3 @@ function Foruns() {
 }
 
 export default Foruns;
-

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AlunoManager() {
   const { user } = useAuth();
   const [alunos, setAlunos] = useState([]);
@@ -10,7 +13,7 @@ function AlunoManager() {
   const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/cursos", {
+    fetch(`${API_URL}/api/cursos`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -21,7 +24,7 @@ function AlunoManager() {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/enrollments", {
+    fetch(`${API_URL}/api/enrollments`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -33,7 +36,7 @@ function AlunoManager() {
 
   useEffect(() => {
     if (selectedCourse) {
-      fetch(`http://localhost:4000/api/aluno/progresso/admin?courseId=${selectedCourse}`, {
+      fetch(`${API_URL}/api/aluno/progresso/admin?courseId=${selectedCourse}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -45,7 +48,7 @@ function AlunoManager() {
   }, [selectedCourse]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/users", {
+    fetch(`${API_URL}/api/users`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -59,7 +62,7 @@ function AlunoManager() {
   }, []);
 
   const handleMatricular = (userId, cursoId) => {
-    fetch("http://localhost:4000/api/enrollments", {
+    fetch(`${API_URL}/api/enrollments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +76,7 @@ function AlunoManager() {
   };
 
   const handleDesmatricular = (matriculaId) => {
-    fetch(`http://localhost:4000/api/enrollments/${matriculaId}`, {
+    fetch(`${API_URL}/api/enrollments/${matriculaId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,

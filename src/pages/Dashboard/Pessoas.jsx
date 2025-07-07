@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Pessoas() {
   const { user } = useAuth();
   const [pessoas, setPessoas] = useState([]);
   const [matriculas, setMatriculas] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/enrollments", {
+    fetch(`${API_URL}/api/enrollments`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -18,7 +21,7 @@ function Pessoas() {
   }, [user.id]);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/users", {
+    fetch(`${API_URL}/api/users`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

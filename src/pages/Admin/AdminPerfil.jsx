@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
+// Definir a constante API_URL usando a variável de ambiente
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function AdminPerfil() {
   const { user, token, logout } = useAuth();
   const [nome, setNome] = useState(user?.nome || '');
@@ -21,7 +24,7 @@ export default function AdminPerfil() {
         payload.senhaAtual = senhaAtual;
         payload.novaSenha = novaSenha;
       }
-      const res = await fetch(`http://localhost:4000/api/users/${user.id}`, {
+      const res = await fetch(`${API_URL}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -89,4 +92,3 @@ export default function AdminPerfil() {
     </div>
   );
 }
-
